@@ -5,10 +5,12 @@ import codecs
 import os
 from random import randint
 from time import time, sleep
+import sys
 
 import telebot
 from telebot import types
 
+from alert import *
 from weather import get_weather
 
 def get_credentails():
@@ -53,11 +55,15 @@ def command_start(message):
 			raise ValueError
 		# location = ref['location']
 		bot.send_message(message.chat.id, 'Данные о местоположении уже получены.\nИспользуйте "/weather", чтобы получить данные о погоде.')
-	except:
+	except (ValueError, TypeError):
+		alert(f"[ ALERT ] in START_COMMAND of USER-{message.from_user.id} : time exceded (1 hour location cooldown) or user not exist.")
 		keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
 		button_geo = types.KeyboardButton(text="Отправить местоположение", request_location=True)
 		keyboard.add(button_geo)
 		bot.send_message(message.chat.id, "Необходимо дать доступ к местоположению.", reply_markup=keyboard)
+	except:
+		error(f"[ ERROR ] in COMMAND_START of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+		
 
 
 @bot.message_handler(content_types=["location"])
@@ -74,6 +80,8 @@ def save_location(message):
 			'time'	:	message.date
 		})
 	except:
+		error(f"[ ERROR ] in SAVE_LOCATION of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+		alert(f"[ ALERT ] in SAVE_LOCATION of USER-{message.from_user.id} : new user.")
 		DB.collection('locations').document(uid).set({
 			'user_id'	:	uid,
 			'location'	:	{
@@ -91,9 +99,9 @@ def save_location(message):
 @bot.message_handler(commands=['weather'])
 def command_weather(message: types.Message):
 	# global location
-	ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
 	msg = 'Необходимо дать доступ к местоположению командой "/start".'
 	try:
+		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
 		if message.date - ref['time'] > 3600:
 			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
 			raise ValueError
@@ -101,8 +109,38 @@ def command_weather(message: types.Message):
 		location = ref['location']
 		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
 		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
-	except:
+	except ValueError:
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : time exceded (1 hour location cooldown).")
 		bot.send_message(message.chat.id, text=msg)
+	except TypeError:
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : user not exist.")
+		bot.send_message(message.chat.id, text=msg)
+	except:
+		error(f"[ ERROR ] in COMMAND_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+	# location = None
+
+
+@bot.message_handler(commands=['weather_new'])
+def command_weather_new(message: types.Message):
+	# global location
+	msg = 'Необходимо дать доступ к местоположению командой "/start".'
+	try:
+		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
+		if message.date - ref['time'] > 3600:
+			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
+			raise ValueError
+		global last_weather
+		location = ref['location']
+		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
+		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
+	except ValueError:
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : time exceded (1 hour location cooldown).")
+		bot.send_message(message.chat.id, text=msg)
+	except TypeError:
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : user not exist.")
+		bot.send_message(message.chat.id, text=msg)
+	except:
+		error(f"[ ERROR ] in COMMAND_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 	# location = None
 
 
