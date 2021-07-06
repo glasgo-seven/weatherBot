@@ -120,30 +120,6 @@ def command_weather(message: types.Message):
 	# location = None
 
 
-@bot.message_handler(commands=['weather_new'])
-def command_weather_new(message: types.Message):
-	# global location
-	msg = 'Необходимо дать доступ к местоположению командой "/start".'
-	try:
-		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
-		if message.date - ref['time'] > 3600:
-			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
-			raise ValueError
-		global last_weather
-		location = ref['location']
-		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
-		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
-	except ValueError:
-		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : time exceded (1 hour location cooldown).")
-		bot.send_message(message.chat.id, text=msg)
-	except TypeError:
-		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : user not exist.")
-		bot.send_message(message.chat.id, text=msg)
-	except:
-		error(f"[ ERROR ] in COMMAND_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
-	# location = None
-
-
 @bot.message_handler(commands=['report'])
 def command_report(message: types.Message):
 	if last_weather != None:
@@ -156,8 +132,7 @@ def command_help(message: types.Message):
 	bot.send_message(message.chat.id, text='\
 /start - Запустить бота.\n\
 /help - Помощь.\n\
-/weather - Получить погоду.\n\
-/weather_new - Получить погоду в новой геолокации.')
+/weather - Получить погоду.')
 
 
 
