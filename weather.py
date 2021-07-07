@@ -49,29 +49,32 @@ def get_weather(location):
 			now_weat_i = ''
 		week = soup.find('div', id='WxuDailyWeatherCard-main-bb1a17e7-dc20-421a-b1b8-c117308c6626').find_all('li')
 	except:
-		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+		alert(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 		return None
 
-	if lang == 'RU':
-		res = f'{now_loca}\nСейчас:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
-	else:
-		res = f'{now_loca}\nNow:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
-	for we in week:
-		divs = we.find_all('div')
-		try:
-			if lang == 'RU':
-				weather_t = WEATHER[we.title.text][0]
-			else:
-				weather_t = we.title.text
-			weather_i = WEATHER[we.title.text][1]
-		except:
-			weather_t = we.title.text
-			weather_i = ''
+	try:
 		if lang == 'RU':
-			res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀День:⠀{divs[0].text}{deg}\n⠀⠀Ночь:⠀{divs[1].text}{deg}'
+			res = f'{now_loca}\nСейчас:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
 		else:
-			res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀Day:⠀{divs[0].text}{deg}\n⠀⠀Night:⠀{divs[1].text}{deg}'
+			res = f'{now_loca}\nNow:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
+		for we in week:
+			divs = we.find_all('div')
+			try:
+				if lang == 'RU':
+					weather_t = WEATHER[we.title.text][0]
+				else:
+					weather_t = we.title.text
+				weather_i = WEATHER[we.title.text][1]
+			except:
+				weather_t = we.title.text
+				weather_i = ''
+			if lang == 'RU':
+				res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀День:⠀{divs[0].text}{deg}\n⠀⠀Ночь:⠀{divs[1].text}{deg}'
+			else:
+				res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀Day:⠀{divs[0].text}{deg}\n⠀⠀Night:⠀{divs[1].text}{deg}'
 
-	return res
-
+		return res
+	except:
+		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+		return None
 # print(get_weather('55.75,37.58'))
