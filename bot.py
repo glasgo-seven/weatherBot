@@ -102,7 +102,6 @@ def command_weather(message: types.Message):
 	msg = 'Необходимо дать доступ к местоположению командой "/start".'
 	try:
 		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
-		print(message.date, ref['time'])
 		if message.date - ref['time'] > 3600:
 			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
 			raise ValueError

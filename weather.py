@@ -44,6 +44,7 @@ def get_weather(location):
 			now_weat_t = now_weat
 		now_weat_i = WEATHER[now_weat][1]
 	except:
+		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 		now_weat_t = now_weat
 		now_weat_i = ''
 	week = soup.find('div', id='WxuDailyWeatherCard-main-bb1a17e7-dc20-421a-b1b8-c117308c6626').find_all('li')
@@ -61,6 +62,7 @@ def get_weather(location):
 				weather_t = we.title.text
 			weather_i = WEATHER[we.title.text][1]
 		except:
+			error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 			weather_t = we.title.text
 			weather_i = ''
 		if lang == 'RU':
