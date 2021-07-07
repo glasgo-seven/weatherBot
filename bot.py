@@ -31,7 +31,7 @@ DB = firestore.client()
 
 def get_token():
 	try:
-		return open('.token_test', 'r').read()
+		return open('.token', 'r').read()
 	except FileNotFoundError:
 		return os.getenv('BOT_TOKEN')
 
