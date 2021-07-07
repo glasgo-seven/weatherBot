@@ -107,6 +107,7 @@ def command_weather(message: types.Message):
 			raise ValueError
 		global last_weather
 		location = ref['location']
+		print(ref, ref['location'], location, sep='\n')
 		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
 		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
 	except ValueError:
