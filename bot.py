@@ -31,7 +31,7 @@ DB = firestore.client()
 
 def get_token():
 	try:
-		return open('.token', 'r').read()
+		return open('.token_test', 'r').read()
 	except FileNotFoundError:
 		return os.getenv('BOT_TOKEN')
 
@@ -123,7 +123,7 @@ def command_weather(message: types.Message):
 @bot.message_handler(commands=['report'])
 def command_report(message: types.Message):
 	if last_weather != None:
-		bot.send_message(get_report_chatid(), text=f'REPORT by {message.from_user.username} - {message.date}\n\n{last_weather}')
+		bot.send_message(get_report_chatid(), text=f'REPORT by\n⠀username⠀:⠀{message.from_user.username}\n⠀user_id⠀:⠀{message.from_user.id}\n⠀date⠀:⠀{message.date}\n\n{last_weather}')
 	bot.send_message(message.chat.id, text='Отчёт отправлен!')
 
 
