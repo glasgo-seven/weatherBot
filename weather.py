@@ -38,6 +38,8 @@ def get_weather(location):
 		now_temp = grind.span.text
 		now_weat = grind.title.text
 
+		now_weat_t = None
+		now_weat_i = None
 		try:
 			if lang == 'RU':
 				now_weat_t = WEATHER[now_weat][0]
@@ -49,12 +51,15 @@ def get_weather(location):
 			now_weat_i = ''
 		week = soup.find('div', id='WxuDailyWeatherCard-main-bb1a17e7-dc20-421a-b1b8-c117308c6626').find_all('li')
 
+		res = None
 		if lang == 'RU':
 			res = f'{now_loca}\nСейчас:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
 		else:
 			res = f'{now_loca}\nNow:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
 		for we in week:
 			divs = we.find_all('div')
+			weather_t = None
+			weather_i = None
 			try:
 				if lang == 'RU':
 					weather_t = WEATHER[we.title.text][0]
