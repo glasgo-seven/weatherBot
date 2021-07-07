@@ -79,6 +79,7 @@ def get_weather(location):
 			else:
 				res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀Day:⠀{divs[0].text}{deg}\n⠀⠀Night:⠀{divs[1].text}{deg}'
 
+		print(res)
 		return res
 	except:
 		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
