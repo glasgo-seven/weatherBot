@@ -115,8 +115,8 @@ def command_weather(message: types.Message):
 	except TypeError:
 		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : user not exist.")
 		bot.send_message(message.chat.id, text=msg)
-	# except:
-	# 	error(f"[ ERROR ] in COMMAND_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
+	except:
+		error(f"[ ERROR ] in COMMAND_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 	# location = None
 
 
