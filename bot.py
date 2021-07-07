@@ -100,19 +100,20 @@ def save_location(message):
 def command_weather(message: types.Message):
 	# global location
 	msg = 'Необходимо дать доступ к местоположению командой "/start".'
-	value = 0
 	try:
 		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
 		if message.date - ref['time'] > 3600:
 			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
-			value = 1
 			raise ValueError
 		global last_weather
 		location = ref['location']
 		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
 		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
+	except IndexError:
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : index error.")
+		bot.send_message(message.chat.id, text=msg)
 	except ValueError:
-		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} STATE-{value} : time exceded (1 hour location cooldown).")
+		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : time exceded (1 hour location cooldown).")
 		bot.send_message(message.chat.id, text=msg)
 	except TypeError:
 		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : user not exist.")
