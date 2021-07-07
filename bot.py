@@ -102,6 +102,7 @@ def command_weather(message: types.Message):
 	msg = 'Необходимо дать доступ к местоположению командой "/start".'
 	try:
 		ref = DB.collection('locations').document(str(message.from_user.id)).get().to_dict()
+		print(ref)
 		if message.date - ref['time'] > 3600:
 			msg = 'Данные о местоположении устарели. Обновите командой "/start".'
 			raise ValueError
@@ -109,9 +110,6 @@ def command_weather(message: types.Message):
 		location = ref['location']
 		last_weather = get_weather(f"{location['latitude']},{location['longitude']}")
 		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
-	except IndexError:
-		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : index error.")
-		bot.send_message(message.chat.id, text=msg)
 	except ValueError:
 		alert(f"[ ALERT ] in COMMAND_WEATHER of USER-{message.from_user.id} : time exceded (1 hour location cooldown).")
 		bot.send_message(message.chat.id, text=msg)
