@@ -23,6 +23,8 @@ WEATHER = {
 from bs4 import BeautifulSoup
 import requests as req
 
+from alert import *
+
 def get_weather(location):
 	try:
 		resp = req.get(f"https://weather.com/ru-RU/weather/today/l/{location}")

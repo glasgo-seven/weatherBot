@@ -1,8 +1,8 @@
 def error(msg):
-	print(f'\x1b[0;31;40m{msg}\x1b[0m')
+	print(f'\x1b[0;31m{msg}\x1b[0m')
 
 def alert(msg):
-	print(f'\x1b[0;33;40m{msg}\x1b[0m')
+	print(f'\x1b[0;33m{msg}\x1b[0m')
 
 # FOREGROUND_COLORS = {
 # 	'black'	 : '0;30',
