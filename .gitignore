@@ -1,4 +1,5 @@
-__pycache__
-.heroku
+__pycache__/
+.ignore/
 
-git.sh
+/.report
+/.token
