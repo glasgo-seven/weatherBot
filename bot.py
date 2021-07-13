@@ -32,7 +32,7 @@ last_weather = None
 @bot.message_handler(commands=["start"])
 def command_start(message):
 	try:
-		keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True, one_time_keyboard=True)
+		keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True) #, one_time_keyboard=True)
 		button_geo = types.KeyboardButton(text="Получить погоду!", request_location=True)
 		keyboard.add(button_geo)
 		bot.send_message(message.chat.id, "Нажми на кнопку внизу, чтобы получить погоду в твоей геопозиции!", reply_markup=keyboard)
@@ -46,8 +46,9 @@ def save_location(message):
 		uid = str(message.from_user.id)
 		global last_weather
 		location = f"{message.location.latitude},{message.location.longitude}"
+		bot_msg = bot.send_message(message.chat.id, text='Загружаю погоду...')
 		last_weather = get_weather(message, location)
-		bot.send_message(message.chat.id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
+		bot.edit_message_text(chat_id=message.chat.id, message_id=bot_msg.message_id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
 	except:
 		error(f"[ ERROR ] in SAVE_LOCATION of USER-{message.from_user.id} : {sys.exc_info()}")
 

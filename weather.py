@@ -6,9 +6,11 @@ WEATHER = {
 	'Mostly Cloudy'				:	['Облачно с прояснениями', '\U0001F325'],
 	'Cloudy'					:	['Облачно', '\U00002601'],
 
-	'Scattered Showers'			:	['Местами дождь', '\U0001F326'],
+	'Isolated Showers'			:	['Местами дождь', '\U0001F326'],
+	'Scattered Showers'			:	['Рассеянный дождь', '\U0001F326'],
 	'Rain'						:	['Дождь', '\U0001F327'],
-	'Scattered Thunderstorms'	:	['Местами грозы', '\U000026C8'],
+	'Isolated Thunderstorms'	:	['Местами грозы', '\U000026C8'],
+	'Scattered Thunderstorms'	:	['Рассеянные грозы', '\U000026C8'],
 	'Thunderstorm'				:	['Гроза', '\U0001F329'],
 
 	'Wind'						:	['Ветренно', '\U0001F32C'],
@@ -78,4 +80,5 @@ def get_weather(message, location):
 	except:
 		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
 		return None
+
 # print(get_weather('55.75,37.58'))
