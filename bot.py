@@ -4,7 +4,7 @@
 import codecs
 import os
 from random import randint
-from time import time, sleep
+from time import time, sleep, strftime, localtime
 import sys
 
 import telebot
@@ -12,6 +12,7 @@ from telebot import types
 
 from alert import *
 from weather import get_weather
+from db import data, Data
 
 def get_token():
 	try:
@@ -43,12 +44,26 @@ def command_start(message):
 @bot.message_handler(content_types=["location"])
 def save_location(message):
 	try:
-		uid = str(message.from_user.id)
-		global last_weather
+		uid_i = message.from_user.id
+		uid = str(uid_i)
+		# global last_weather
 		location = f"{message.location.latitude},{message.location.longitude}"
 		bot_msg = bot.send_message(message.chat.id, text='Загружаю погоду...')
-		last_weather = get_weather(message, location)
-		bot.edit_message_text(chat_id=message.chat.id, message_id=bot_msg.message_id, text=f'{last_weather}\n\nЕсли произошла ошибка, отправьте отчёт командой "/report".')
+		weather = get_weather(message, location)
+
+		user = Data.query.get(uid_i)
+		if user == None:
+			data.session.add(Data(uid=uid_i, username=message.from_user.username, time=message.date, weather=weather))
+			data.session.commit()
+		else:
+			user.update({
+				'username'	:	message.from_user.username,
+				'time'		:	message.date,
+				'weather'	:	weather
+			})
+			data.session.commit()
+
+		bot.edit_message_text(chat_id=message.chat.id, message_id=bot_msg.message_id, text=f'{weather}\n\nЗаметили ошибку? Отправьте отчёт командой "/report"!')
 	except:
 		error(f"[ ERROR ] in SAVE_LOCATION of USER-{message.from_user.id} : {sys.exc_info()}")
 
@@ -56,13 +71,34 @@ def save_location(message):
 @bot.message_handler(commands=['report'])
 def command_report(message: types.Message):
 	try:
-		if last_weather != None:
-			bot.send_message(get_report_chatid(), text=f'REPORT by\n⠀username⠀:⠀{message.from_user.username}\n⠀user_id⠀:⠀{message.from_user.id}\n⠀date⠀:⠀{message.date}\n\n{last_weather}')
-		bot.send_message(message.chat.id, text='Отчёт отправлен!')
+		keyboard = types.InlineKeyboardMarkup(row_width=1)
+		keyboard.add(
+			types.InlineKeyboardButton(text="Пустой прогноз", callback_data='empty_answer'),
+			types.InlineKeyboardButton(text="Неверная погода", callback_data='wrong_weather'),
+			types.InlineKeyboardButton(text="Сбой языка", callback_data='language_error'),
+			types.InlineKeyboardButton(text="Другое", callback_data='other')
+		)
+		bot.send_message(message.chat.id, "Выбери тип ошибки:", reply_markup=keyboard)
 	except:
 		error(f"[ ERROR ] in COMMAND_REPORT of USER-{message.from_user.id} : {sys.exc_info()}")
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+	try:
+		# print(call)
+		if call.message:
+			uid_i = call.from_user.id
+			user = Data.query.get(uid_i)
+			if user != None:
+				bot.send_message(get_report_chatid(), text=f'----------------\nREPORT - [{call.data.upper()}]\nby\n⠀username⠀:⠀{user.username}\n⠀user_id⠀:⠀{user.uid}\n⠀date⠀:⠀{strftime("%d-%m-%y %H:%M:%S", localtime(user.time))} (e{user.time})\n----------------\n\n{user.weather}')
+			bot.send_message(call.message.chat.id, text='Отчёт отправлен!')
+	except:
+		error(f"[ ERROR ] in CALLBACK_INLINE of USER-{call.message.from_user.id} : {sys.exc_info()}")
+
+
 print('------------------------')
+print('/// DATA ///')
+print(Data.query.all())
 print('/// BOT IS POLLING ///')
 bot.polling()
