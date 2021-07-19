@@ -95,7 +95,7 @@ def callback_inline(call):
 				bot.send_message(get_report_chatid(), text=f'----------------\nREPORT {rid}\ntype\n⠀[{call.data.upper()}]\nby\n⠀username⠀:⠀{user.username}\n⠀user_id⠀:⠀{user.uid}\n⠀date⠀:⠀{strftime("%d-%m-%y %H:%M:%S", localtime(user.time))} (e{user.time})\n----------------\n\n{user.weather}')
 				bot.send_message(call.message.chat.id, text=f'Отчёт об ошибке отправлен!\nRID:⠀{rid}')
 			else:
-				bot.send_message(call.message.chat.id, text='К сожалению,  отчёт не может быть отправлен.')
+				bot.send_message(call.message.chat.id, text='К сожалению, отчёт не может быть отправлен.')
 	except:
 		error(f"[ ERROR ] in CALLBACK_INLINE of USER-{call.message.from_user.id} : {sys.exc_info()}")
 
@@ -103,8 +103,8 @@ def callback_inline(call):
 @bot.message_handler(commands=['report_callback'])
 def command_report_callback(message: types.Message):
 	try:
-		uid, msg = message.text.split('  ')[1:]
-		bot.send_message(message.chat.id, text=f"{uid} {msg}")
+		uid, rid, msg = message.text.split('\n')[1:]
+		bot.send_message(message.chat.id, text=f"❗ Ответ на ваш отчёт ❗\n✔️ RID: {rid} !\n\n{msg}\n⠀by {message.from_user.username}")
 	except:
 		error(f"[ ERROR ] in COMMAND_REPORT_CALLBACK of USER-{message.from_user.id} : {sys.exc_info()}")
 

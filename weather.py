@@ -26,6 +26,7 @@ WEATHER = {
 from bs4 import BeautifulSoup
 import requests as req
 import sys
+from time import time, strftime, localtime
 
 from alert import *
 
@@ -40,42 +41,39 @@ def get_weather(message, location):
 		deg = loc[1].text[-1]
 
 		grind = soup.find('div', id='WxuCurrentConditions-main-b3094163-ef75-4558-8d9a-e35e6b9b1034')
-		now_loca = grind.h1.text
-		now_temp = grind.span.text
+		gspans = grind.find_all('span')
+		now_loca = grind.h1.text.split(': ')[1]
+		now_temp = gspans[0].text
 		now_weat = grind.title.text
+		now_rain = gspans[-1].text
 
 		try:
-			if lang == 'RU':
-				now_weat_t = WEATHER[now_weat][0]
-			else:
-				now_weat_t = now_weat
+			now_weat_t = WEATHER[now_weat][0]
 			now_weat_i = WEATHER[now_weat][1]
 		except:
-			now_weat_t = now_weat
-			now_weat_i = ''
+			try:
+				now_weat_t = WEATHER[now_weat.split(' Night')[0]][0] + ', ночь'
+				now_weat_i = WEATHER[now_weat.split(' Night')[0]][1]
+			except:
+				now_weat_t = now_weat
+				now_weat_i = '❓'
 		week = soup.find('div', id='WxuDailyWeatherCard-main-bb1a17e7-dc20-421a-b1b8-c117308c6626').find_all('li')
 
-		if lang == 'RU':
-			res = f'{now_loca}\nСейчас:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
-		else:
-			res = f'{now_loca}\nNow:⠀{now_temp}{deg}\n{now_weat_i}⠀{now_weat_t}\n'
+		res = f'Погода в\n⠀{now_loca}\nСейчас {strftime("%H:%M", localtime(time()))}\n⠀{now_temp}{deg}\n⠀{now_weat_i}⠀{now_weat_t}\n⠀{now_rain}\n'
 
 		for we in week:
 			divs = we.find_all('div')
 			try:
-				if lang == 'RU':
-					weather_t = WEATHER[we.title.text][0]
-				else:
-					weather_t = we.title.text
+				weather_t = WEATHER[we.title.text][0]
 				weather_i = WEATHER[we.title.text][1]
 			except:
-				weather_t = we.title.text
-				weather_i = ''
-			if lang == 'RU':
-				res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀День:⠀{divs[0].text}{deg}\n⠀⠀Ночь:⠀{divs[1].text}{deg}'
-			else:
-				res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀Day:⠀{divs[0].text}{deg}\n⠀⠀Night:⠀{divs[1].text}{deg}'
-
+				try:
+					weather_t = WEATHER[we.title.text.split(' Night')[0]][0] + ', ночь'
+					weather_i = WEATHER[we.title.text.split(' Night')[0]][1]
+				except:
+					weather_t = we.title.text
+					weather_i = '❓'
+			res += f'\n{we.h3.text.upper()}⠀-⠀{weather_i}⠀{weather_t}\n⠀⠀День:⠀{divs[0].text}{deg}\n⠀⠀Ночь:⠀{divs[1].text}{deg}\n⠀⠀Вероятность дождя:⠀{divs[3].find_all("span")[0].text.split("Вероятность дождя")[-1]}'
 		return res
 	except:
 		error(f"[ ERROR ] in GET_WEATHER of USER-{message.from_user.id} : {sys.exc_info()[0]}.")
