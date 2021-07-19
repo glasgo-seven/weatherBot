@@ -15,5 +15,6 @@ class Data(data.Model):
 	def __repr__(self):
 		return f"Data( {self.uid}, '{self.username}', {self.time}, Weather<> )"
 
+
 data.drop_all()
 data.create_all()
