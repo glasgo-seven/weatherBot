@@ -36,7 +36,7 @@ def command_start(message):
 		keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True) #, one_time_keyboard=True)
 		button_geo = types.KeyboardButton(text="Получить погоду!", request_location=True)
 		keyboard.add(button_geo)
-		bot.send_message(message.chat.id, text="Нажми на кнопку внизу, чтобы получить погоду в твоей геопозиции!", reply_markup=keyboard)
+		bot.send_message(message.chat.id, text="Нажми на кнопку внизу, чтобы получить погоду в твоей геопозиции*!\n\n*Отправка данных геопозиции работает только на мобильных устройствах.", reply_markup=keyboard)
 	except:
 		error(f"[ ERROR ] in COMMAND_START of USER-{message.from_user.id} : {sys.exc_info()}")
 
