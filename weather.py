@@ -13,6 +13,9 @@ WEATHER = {
 	'Scattered Thunderstorms'	:	['Рассеянные грозы', '\U000026C8'],
 	'Thunderstorm'				:	['Гроза', '\U0001F329'],
 
+	'Snow'						:	['Снег', '\U0001F328'],
+	'Heavy Snow'				:	['Снегопад', '\U0001F328'],
+
 	'Wind'						:	['Ветренно', '\U0001F32C'],
 	'Foggy'						:	['Туман', '\U0001F32B'],
 

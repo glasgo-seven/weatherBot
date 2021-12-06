@@ -105,6 +105,7 @@ def command_report_callback(message: types.Message):
 	try:
 		uid, rid, msg = message.text.split('\n')[1:]
 		bot.send_message(uid, text=f"❗ Ответ на ваш отчёт ❗\n✔️ RID: {rid} !\n\n{msg}\n⠀by {message.from_user.username}")
+		bot.send_message(message.chat.id, text="Отправлено.")
 	except:
 		error(f"[ ERROR ] in COMMAND_REPORT_CALLBACK of USER-{message.from_user.id} : {sys.exc_info()}")
 
